@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import RoomForm from "./components/RoomForm";
 import RoomList from "./components/RoomList";
 import SummaryCard from "./components/SummaryCard";
-import { calculateCable } from "./utils/calculateCable";
+import { calculateCable } from "./utils/calculateCable.js";
 import { loadRooms, saveRooms } from "./utils/storage";
 
 export default function App() {
