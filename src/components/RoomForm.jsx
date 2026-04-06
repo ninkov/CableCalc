@@ -10,11 +10,11 @@ const initialForm = {
   switches: "",
   lights: "",
   appliances: "",
-  socketHeight: "0.30",
-  switchHeight: "1.20",
+  socketHeight: "",
+  switchHeight: "",
   routeSource: "junction_box",
   routeType: "ceiling",
-  reservePercent: "10",
+  reservePercent: "",
 };
 
 export default function RoomForm({ onAddRoom }) {
