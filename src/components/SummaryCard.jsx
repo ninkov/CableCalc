@@ -37,7 +37,8 @@
 //           Контакти: <strong>{totals.sockets.toFixed(2)} м</strong>
 //         </p>
 //         <p>
-//           Консуматори: <strong>{totals.appliances.toFixed(2)} м</strong>
+//           Специализирани линии:{" "}
+//           <strong>{totals.appliances.toFixed(2)} м</strong>
 //         </p>
 //         <p>
 //           Резерв: <strong>{totals.reserve.toFixed(2)} м</strong>

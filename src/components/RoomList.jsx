@@ -1,3 +1,4 @@
+
 // export default function RoomList({ rooms, onDeleteRoom, onEditRoom }) {
 //   if (rooms.length === 0) {
 //     return (
@@ -38,7 +39,7 @@
 //                   </strong>
 //                 </p>
 //                 <p>
-//                   Консуматори ({room.applianceCableType || "3x4"}):{" "}
+//                   Специализирани линии ({room.applianceCableType || "3x4"}):{" "}
 //                   <strong>
 //                     {Number(room.result?.appliances || 0).toFixed(2)} м
 //                   </strong>
@@ -119,11 +120,24 @@ export default function RoomList({ rooms, onDeleteRoom, onEditRoom }) {
                   </strong>
                 </p>
                 <p>
-                  Специализирани линии ({room.applianceCableType || "3x4"}):{" "}
+                  Специализирани линии:{" "}
                   <strong>
                     {Number(room.result?.appliances || 0).toFixed(2)} м
                   </strong>
                 </p>
+
+                {Array.isArray(room.result?.specialCircuits) &&
+                  room.result.specialCircuits.length > 0 && (
+                    <div className="pl-3 pt-1 space-y-1 text-slate-600">
+                      {room.result.specialCircuits.map((item) => (
+                        <p key={item.id}>
+                          - {item.label} ({item.cableType}):{" "}
+                          <strong>{Number(item.meters || 0).toFixed(2)} м</strong>
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
                 <p>
                   Резерв:{" "}
                   <strong>
