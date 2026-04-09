@@ -39,11 +39,24 @@
 //                   </strong>
 //                 </p>
 //                 <p>
-//                   Специализирани линии ({room.applianceCableType || "3x4"}):{" "}
+//                   Специализирани линии:{" "}
 //                   <strong>
 //                     {Number(room.result?.appliances || 0).toFixed(2)} м
 //                   </strong>
 //                 </p>
+
+//                 {Array.isArray(room.result?.specialCircuits) &&
+//                   room.result.specialCircuits.length > 0 && (
+//                     <div className="pl-3 pt-1 space-y-1 text-slate-600">
+//                       {room.result.specialCircuits.map((item) => (
+//                         <p key={item.id}>
+//                           - {item.label} ({item.cableType}):{" "}
+//                           <strong>{Number(item.meters || 0).toFixed(2)} м</strong>
+//                         </p>
+//                       ))}
+//                     </div>
+//                   )}
+
 //                 <p>
 //                   Резерв:{" "}
 //                   <strong>
@@ -80,6 +93,7 @@
 //     </div>
 //   );
 // }
+
 export default function RoomList({ rooms, onDeleteRoom, onEditRoom }) {
   if (rooms.length === 0) {
     return (
@@ -105,6 +119,10 @@ export default function RoomList({ rooms, onDeleteRoom, onEditRoom }) {
               <p className="text-sm text-slate-500">
                 {room.type} • {room.length} x {room.width} x {room.height} м
               </p>
+
+              <div className="mt-2 text-sm text-slate-500">
+                Осветителни кръгове: {Number(room.lightingCircuits || 1)}
+              </div>
 
               <div className="mt-3 text-sm space-y-1 text-slate-700">
                 <p>

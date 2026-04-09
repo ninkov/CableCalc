@@ -1,5 +1,9 @@
 
 // import { useEffect, useState } from "react";
+// import {
+//   SPECIAL_CIRCUIT_OPTIONS,
+//   getSpecialCircuitOption,
+// } from "../data/specialCircuitOptions";
 
 // const initialForm = {
 //   name: "",
@@ -10,7 +14,6 @@
 //   sockets: "",
 //   switches: "",
 //   lights: "",
-//   appliances: "",
 //   socketHeight: "0.30",
 //   switchHeight: "1.20",
 //   routeSource: "junction_box",
@@ -18,11 +21,12 @@
 //   reservePercent: "10",
 //   lightingCableType: "3x1.5",
 //   socketCableType: "3x2.5",
-//   applianceCableType: "3x4",
+//   specialCircuits: [],
 // };
 
 // export default function RoomForm({ onSaveRoom, editingRoom, onCancelEdit }) {
 //   const [form, setForm] = useState(initialForm);
+//   const [selectedCircuitType, setSelectedCircuitType] = useState("boiler");
 
 //   useEffect(() => {
 //     if (editingRoom) {
@@ -35,7 +39,6 @@
 //         sockets: editingRoom.sockets ?? "",
 //         switches: editingRoom.switches ?? "",
 //         lights: editingRoom.lights ?? "",
-//         appliances: editingRoom.appliances ?? "",
 //         socketHeight: editingRoom.socketHeight ?? "0.30",
 //         switchHeight: editingRoom.switchHeight ?? "1.20",
 //         routeSource: editingRoom.routeSource ?? "junction_box",
@@ -43,7 +46,9 @@
 //         reservePercent: editingRoom.reservePercent ?? "10",
 //         lightingCableType: editingRoom.lightingCableType ?? "3x1.5",
 //         socketCableType: editingRoom.socketCableType ?? "3x2.5",
-//         applianceCableType: editingRoom.applianceCableType ?? "3x4",
+//         specialCircuits: Array.isArray(editingRoom.specialCircuits)
+//           ? editingRoom.specialCircuits
+//           : [],
 //       });
 //     } else {
 //       setForm(initialForm);
@@ -55,6 +60,39 @@
 //     setForm((prev) => ({
 //       ...prev,
 //       [name]: value,
+//     }));
+//   }
+
+//   function addSpecialCircuit() {
+//     const option = getSpecialCircuitOption(selectedCircuitType);
+//     if (!option) return;
+
+//     const newCircuit = {
+//       id: crypto.randomUUID(),
+//       type: option.value,
+//       label: option.label,
+//       cableType: option.defaultCableType,
+//     };
+
+//     setForm((prev) => ({
+//       ...prev,
+//       specialCircuits: [...prev.specialCircuits, newCircuit],
+//     }));
+//   }
+
+//   function removeSpecialCircuit(id) {
+//     setForm((prev) => ({
+//       ...prev,
+//       specialCircuits: prev.specialCircuits.filter((item) => item.id !== id),
+//     }));
+//   }
+
+//   function updateSpecialCircuitCableType(id, cableType) {
+//     setForm((prev) => ({
+//       ...prev,
+//       specialCircuits: prev.specialCircuits.map((item) =>
+//         item.id === id ? { ...item, cableType } : item
+//       ),
 //     }));
 //   }
 
@@ -75,14 +113,16 @@
 //       sockets: Number(form.sockets || 0),
 //       switches: Number(form.switches || 0),
 //       lights: Number(form.lights || 0),
-//       appliances: Number(form.appliances || 0),
+//       appliances: form.specialCircuits.length,
 //       socketHeight: Number(form.socketHeight),
 //       switchHeight: Number(form.switchHeight),
 //       reservePercent: Number(form.reservePercent),
+//       applianceCableType: form.specialCircuits[0]?.cableType || "3x4",
 //     };
 
 //     onSaveRoom(preparedRoom);
 //     setForm(initialForm);
+//     setSelectedCircuitType("boiler");
 //   }
 
 //   return (
@@ -189,15 +229,6 @@
 
 //         <input
 //           type="number"
-//           name="appliances"
-//           placeholder="Брой специализирани линии"
-//           value={form.appliances}
-//           onChange={handleChange}
-//           className="border rounded-xl px-4 py-2"
-//         />
-
-//         <input
-//           type="number"
 //           step="0.01"
 //           name="socketHeight"
 //           placeholder="Височина на контактите"
@@ -267,16 +298,72 @@
 //           <option value="3x4">Контакти - 3x4</option>
 //           <option value="3x6">Контакти - 3x6</option>
 //         </select>
+//       </div>
 
-//         <select
-//           name="applianceCableType"
-//           value={form.applianceCableType}
-//           onChange={handleChange}
-//           className="border rounded-xl px-4 py-2"
-//         >
-//           <option value="3x4">Специализирани линии - 3x4</option>
-//           <option value="3x6">Специализирани линии - 3x6</option>
-//         </select>
+//       <div className="border rounded-2xl p-4 space-y-3">
+//         <h3 className="font-semibold">Специализирани линии</h3>
+
+//         <div className="flex flex-col md:flex-row gap-3">
+//           <select
+//             value={selectedCircuitType}
+//             onChange={(e) => setSelectedCircuitType(e.target.value)}
+//             className="border rounded-xl px-4 py-2 flex-1"
+//           >
+//             {SPECIAL_CIRCUIT_OPTIONS.map((option) => (
+//               <option key={option.value} value={option.value}>
+//                 {option.label}
+//               </option>
+//             ))}
+//           </select>
+
+//           <button
+//             type="button"
+//             onClick={addSpecialCircuit}
+//             className="bg-slate-800 text-white px-4 py-2 rounded-xl hover:opacity-90"
+//           >
+//             Добави линия
+//           </button>
+//         </div>
+
+//         {form.specialCircuits.length === 0 ? (
+//           <p className="text-sm text-slate-500">
+//             Все още няма добавени специализирани линии.
+//           </p>
+//         ) : (
+//           <div className="space-y-3">
+//             {form.specialCircuits.map((item) => (
+//               <div
+//                 key={item.id}
+//                 className="border rounded-xl p-3 flex flex-col md:flex-row gap-3 md:items-center md:justify-between"
+//               >
+//                 <div>
+//                   <p className="font-medium">{item.label}</p>
+//                 </div>
+
+//                 <div className="flex gap-3">
+//                   <select
+//                     value={item.cableType}
+//                     onChange={(e) =>
+//                       updateSpecialCircuitCableType(item.id, e.target.value)
+//                     }
+//                     className="border rounded-xl px-3 py-2"
+//                   >
+//                     <option value="3x4">3x4</option>
+//                     <option value="3x6">3x6</option>
+//                   </select>
+
+//                   <button
+//                     type="button"
+//                     onClick={() => removeSpecialCircuit(item.id)}
+//                     className="bg-red-500 text-white px-4 py-2 rounded-xl hover:opacity-90"
+//                   >
+//                     Премахни
+//                   </button>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         )}
 //       </div>
 
 //       <button
@@ -303,6 +390,7 @@ const initialForm = {
   sockets: "",
   switches: "",
   lights: "",
+  lightingCircuits: "1",
   socketHeight: "0.30",
   switchHeight: "1.20",
   routeSource: "junction_box",
@@ -328,6 +416,7 @@ export default function RoomForm({ onSaveRoom, editingRoom, onCancelEdit }) {
         sockets: editingRoom.sockets ?? "",
         switches: editingRoom.switches ?? "",
         lights: editingRoom.lights ?? "",
+        lightingCircuits: editingRoom.lightingCircuits ?? "1",
         socketHeight: editingRoom.socketHeight ?? "0.30",
         switchHeight: editingRoom.switchHeight ?? "1.20",
         routeSource: editingRoom.routeSource ?? "junction_box",
@@ -402,6 +491,7 @@ export default function RoomForm({ onSaveRoom, editingRoom, onCancelEdit }) {
       sockets: Number(form.sockets || 0),
       switches: Number(form.switches || 0),
       lights: Number(form.lights || 0),
+      lightingCircuits: Number(form.lightingCircuits || 1),
       appliances: form.specialCircuits.length,
       socketHeight: Number(form.socketHeight),
       switchHeight: Number(form.switchHeight),
@@ -512,6 +602,16 @@ export default function RoomForm({ onSaveRoom, editingRoom, onCancelEdit }) {
           name="lights"
           placeholder="Брой осветителни тела"
           value={form.lights}
+          onChange={handleChange}
+          className="border rounded-xl px-4 py-2"
+        />
+
+        <input
+          type="number"
+          min="1"
+          name="lightingCircuits"
+          placeholder="Брой осветителни кръгове"
+          value={form.lightingCircuits}
           onChange={handleChange}
           className="border rounded-xl px-4 py-2"
         />

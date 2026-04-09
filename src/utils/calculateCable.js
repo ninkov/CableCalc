@@ -1,3 +1,4 @@
+
 // export function calculateCable(room) {
 //   const length = Number(room.length) || 0;
 //   const width = Number(room.width) || 0;
@@ -8,9 +9,9 @@
 //   const lights = Number(room.lights) || 0;
 //   const appliances = Number(room.appliances) || 0;
 
-//   const socketHeight = Number(room.socketHeight) || 0;
-//   const switchHeight = Number(room.switchHeight) || 0;
-//   const reservePercent = Number(room.reservePercent) || 0;
+//   const socketHeight = Number(room.socketHeight) || 0.3;
+//   const switchHeight = Number(room.switchHeight) || 1.2;
+//   const reservePercent = Number(room.reservePercent) || 10;
 
 //   const routeType = room.routeType || "ceiling";
 //   const routeSource = room.routeSource || "junction_box";
@@ -35,7 +36,6 @@
 
 //   const isCeiling = routeType === "ceiling";
 
-//   // 1) Осветление
 //   let lighting = 0;
 
 //   if (switches > 0 || lights > 0) {
@@ -43,9 +43,7 @@
 //       ? (height - switchHeight) * switches
 //       : switchHeight * switches;
 
-//     const lightVertical = isCeiling
-//       ? lights * 0.35
-//       : lights * height;
+//     const lightVertical = isCeiling ? lights * 0.35 : lights * height;
 
 //     const lightingHorizontal =
 //       (Math.max(switches, 1) * avgSpan * 0.45 +
@@ -60,7 +58,6 @@
 //       lights * 0.4;
 //   }
 
-//   // 2) Контакти
 //   let socketCable = 0;
 
 //   if (sockets > 0) {
@@ -78,22 +75,42 @@
 //       sockets * 0.35;
 //   }
 
-//   // 3) Консуматори
-//   let applianceCable = 0;
+//   const normalizedSpecialCircuits =
+//     Array.isArray(room.specialCircuits) && room.specialCircuits.length > 0
+//       ? room.specialCircuits.map((item, index) => ({
+//           id: item.id || `special-${index + 1}`,
+//           type: item.type || "other",
+//           label: item.label || `Специализирана линия ${index + 1}`,
+//           cableType: item.cableType || room.applianceCableType || "3x4",
+//         }))
+//       : Array.from({ length: appliances }, (_, index) => ({
+//           id: `special-${index + 1}`,
+//           type: "other",
+//           label: `Специализирана линия ${index + 1}`,
+//           cableType: room.applianceCableType || "3x4",
+//         }));
 
-//   if (appliances > 0) {
-//     const applianceVertical = isCeiling
-//       ? (height - socketHeight) * appliances
-//       : socketHeight * appliances;
+//   const perSpecialCircuitVertical = isCeiling
+//     ? height - socketHeight
+//     : socketHeight;
 
-//     const applianceHorizontal =
-//       appliances * (avgSpan * 0.9 + sourceExtra) * sourceFactor;
+//   const perSpecialCircuitHorizontal =
+//     (avgSpan * 0.9 + sourceExtra) * sourceFactor;
 
-//     applianceCable =
-//       applianceHorizontal +
-//       applianceVertical +
-//       appliances * 0.5;
-//   }
+//   const specialCircuitsResult = normalizedSpecialCircuits.map((item) => {
+//     const meters =
+//       perSpecialCircuitHorizontal + perSpecialCircuitVertical + 0.5;
+
+//     return {
+//       ...item,
+//       meters: Number(meters.toFixed(2)),
+//     };
+//   });
+
+//   const applianceCable = specialCircuitsResult.reduce(
+//     (sum, item) => sum + item.meters,
+//     0
+//   );
 
 //   const subtotal = lighting + socketCable + applianceCable;
 //   const reserve = subtotal * (reservePercent / 100);
@@ -105,6 +122,7 @@
 //     appliances: Number(applianceCable.toFixed(2)),
 //     reserve: Number(reserve.toFixed(2)),
 //     total: Number(total.toFixed(2)),
+//     specialCircuits: specialCircuitsResult,
 //   };
 // }
 export function calculateCable(room) {
@@ -115,6 +133,7 @@ export function calculateCable(room) {
   const sockets = Number(room.sockets) || 0;
   const switches = Number(room.switches) || 0;
   const lights = Number(room.lights) || 0;
+  const lightingCircuits = Math.max(Number(room.lightingCircuits) || 1, 1);
   const appliances = Number(room.appliances) || 0;
 
   const socketHeight = Number(room.socketHeight) || 0.3;
@@ -153,16 +172,22 @@ export function calculateCable(room) {
 
     const lightVertical = isCeiling ? lights * 0.35 : lights * height;
 
-    const lightingHorizontal =
-      (Math.max(switches, 1) * avgSpan * 0.45 +
-        Math.max(lights, 1) * avgSpan * 0.55) *
-      sourceFactor;
+    const circuitBaseHorizontal =
+      lightingCircuits * avgSpan * 0.75 * sourceFactor;
+
+    const switchHorizontal =
+      Math.max(switches, lightingCircuits) * avgSpan * 0.35 * sourceFactor;
+
+    const lightsHorizontal =
+      Math.max(lights, 1) * (avgSpan / Math.max(lightingCircuits, 1)) * 0.45;
 
     lighting =
       sourceExtra +
-      switchVertical +
+      circuitBaseHorizontal +
+      switchHorizontal +
       lightVertical +
-      lightingHorizontal +
+      switchVertical +
+      lightsHorizontal +
       lights * 0.4;
   }
 
