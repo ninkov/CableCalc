@@ -62,7 +62,9 @@ export default function App() {
   }
 
   function handleClearAll() {
-    const confirmed = window.confirm("Сигурен ли си, че искаш да изтриеш всички стаи?");
+    const confirmed = window.confirm(
+      "Сигурен ли си, че искаш да изтриеш всички стаи?"
+    );
     if (!confirmed) return;
 
     setRooms([]);
@@ -75,7 +77,7 @@ export default function App() {
         <header className="mb-8">
           <h1 className="text-3xl font-bold">Калкулатор за кабел</h1>
           <p className="text-slate-600 mt-2">
-            Версия 1.1: редакция, по-добра формула и разбивка по вид кабел
+            Версия 1.2: сечения на кабела и обобщение по вид кабел
           </p>
         </header>
 
